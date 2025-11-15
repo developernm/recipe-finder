@@ -3,6 +3,9 @@ import FilterPanel from "@/components/FilterPanel";
 import ActiveFilters from "@/components/ActiveFilters";
 import MealCard from "@/components/MealCard";
 import Pagination from "@/components/Pagination";
+import {useState} from "react";
+import {searchMeals} from "@/lib/api";
+import {Meal} from "@/types/meal";
 
 // Mock data for demonstration
 const mockCategories = [
@@ -39,72 +42,6 @@ const mockAreas = [
   { strArea: "American" },
 ];
 
-const mockMeals = [
-  {
-    idMeal: "52772",
-    strMeal: "Teriyaki Chicken Casserole",
-    strMealThumb:
-      "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
-    strCategory: "Chicken",
-    strArea: "Japanese",
-  },
-  {
-    idMeal: "52944",
-    strMeal: "Escovitch Fish",
-    strMealThumb: "https://www.themealdb.com/images/media/meals/1520084413.jpg",
-    strCategory: "Seafood",
-    strArea: "Jamaican",
-  },
-  {
-    idMeal: "52929",
-    strMeal: "Timbits",
-    strMealThumb:
-      "https://www.themealdb.com/images/media/meals/txsupu1511815755.jpg",
-    strCategory: "Dessert",
-    strArea: "Canadian",
-  },
-  {
-    idMeal: "52768",
-    strMeal: "Apple Frangipan Tart",
-    strMealThumb:
-      "https://www.themealdb.com/images/media/meals/wxywrq1468235067.jpg",
-    strCategory: "Dessert",
-    strArea: "British",
-  },
-  {
-    idMeal: "52893",
-    strMeal: "Apple & Blackberry Crumble",
-    strMealThumb:
-      "https://www.themealdb.com/images/media/meals/xvsurr1511719182.jpg",
-    strCategory: "Dessert",
-    strArea: "British",
-  },
-  {
-    idMeal: "52767",
-    strMeal: "Bakewell tart",
-    strMealThumb:
-      "https://www.themealdb.com/images/media/meals/wyrqqq1468233628.jpg",
-    strCategory: "Dessert",
-    strArea: "British",
-  },
-  {
-    idMeal: "52792",
-    strMeal: "Bread and Butter Pudding",
-    strMealThumb:
-      "https://www.themealdb.com/images/media/meals/xqwwpy1483908697.jpg",
-    strCategory: "Dessert",
-    strArea: "British",
-  },
-  {
-    idMeal: "52803",
-    strMeal: "Beef Wellington",
-    strMealThumb:
-      "https://www.themealdb.com/images/media/meals/vvpprx1487325699.jpg",
-    strCategory: "Beef",
-    strArea: "British",
-  },
-];
-
 /**
  * Home Page Component
  *
@@ -118,9 +55,12 @@ const mockMeals = [
  * 6. Complete the FilterPanel component implementation
  */
 export default function Home() {
+  const [meals, setMeals] = useState<Meal[]>([]);
+
   // Mock handlers
-  const handleSearch = (query: string) => {
-    console.log("Search:", query);
+  const handleSearch = async (query: string): Promise<void> => {
+    const result = await searchMeals(query);
+    setMeals(result);
   };
 
   const handleRemoveCategory = (category: string) => {
@@ -189,7 +129,7 @@ export default function Home() {
 
             {/* Meal Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mockMeals.map((meal) => (
+              {meals.map((meal) => (
                 <MealCard
                   key={meal.idMeal}
                   id={meal.idMeal}
