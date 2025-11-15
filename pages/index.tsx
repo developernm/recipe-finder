@@ -3,51 +3,16 @@ import FilterPanel from "@/components/FilterPanel";
 import ActiveFilters from "@/components/ActiveFilters";
 import MealCard from "@/components/MealCard";
 import Pagination from "@/components/Pagination";
-import {useState} from "react";
-import {searchMeals} from "@/lib/api";
-import {Meal} from "@/types/meal";
-
-// Mock data for demonstration
-const mockCategories = [
-  {
-    idCategory: "1",
-    strCategory: "Beef",
-    strCategoryThumb: "",
-    strCategoryDescription: "",
-  },
-  {
-    idCategory: "2",
-    strCategory: "Chicken",
-    strCategoryThumb: "",
-    strCategoryDescription: "",
-  },
-  {
-    idCategory: "3",
-    strCategory: "Dessert",
-    strCategoryThumb: "",
-    strCategoryDescription: "",
-  },
-  {
-    idCategory: "4",
-    strCategory: "Vegetarian",
-    strCategoryThumb: "",
-    strCategoryDescription: "",
-  },
-];
-
-const mockAreas = [
-  { strArea: "Italian" },
-  { strArea: "Mexican" },
-  { strArea: "Chinese" },
-  { strArea: "American" },
-];
+import {useEffect, useState} from "react";
+import {getAreas, getCategories, searchMeals} from "@/lib/api";
+import {Area, Category, Meal} from "@/types/meal";
 
 /**
  * Home Page Component
  *
  * This is a mock layout demonstrating how to integrate all the provided components.
  * Candidates should:
- * 1. Replace mock data with real API calls to TheMealDB
+ * 1. Replace mock data with real API calls to TheMealDB - DONE
  * 2. Implement actual state management (useState/useReducer)
  * 3. Connect handlers to update state and trigger API calls
  * 4. Implement caching strategy for API responses
@@ -55,9 +20,20 @@ const mockAreas = [
  * 6. Complete the FilterPanel component implementation
  */
 export default function Home() {
-  const [meals, setMeals] = useState<Meal[]>([]);
 
-  // Mock handlers
+  const [meals, setMeals] = useState<Meal[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
+
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, [])
+
+  useEffect(() => {
+    getAreas().then(setAreas);
+  }, [])
+
+    // Mock handlers
   const handleSearch = async (query: string): Promise<void> => {
     const result = await searchMeals(query);
     setMeals(result);
@@ -108,8 +84,8 @@ export default function Home() {
           {/* Sidebar - Filters */}
           <aside className="lg:w-64 flex-shrink-0">
             <FilterPanel
-              categories={mockCategories}
-              areas={mockAreas}
+              categories={categories}
+              areas={areas}
               selectedCategories={["Dessert"]}
               selectedAreas={["British"]}
               onCategoryToggle={handleCategoryToggle}
