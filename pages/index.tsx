@@ -3,9 +3,10 @@ import FilterPanel from "@/components/FilterPanel";
 import ActiveFilters from "@/components/ActiveFilters";
 import MealCard from "@/components/MealCard";
 import Pagination from "@/components/Pagination";
-import {useEffect, useState} from "react";
+import {useEffect, useReducer, useState} from "react";
 import {getAreas, getCategories, searchMeals} from "@/lib/api";
 import {Area, Category, Meal} from "@/types/meal";
+import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
 
 /**
  * Home Page Component
@@ -13,7 +14,7 @@ import {Area, Category, Meal} from "@/types/meal";
  * This is a mock layout demonstrating how to integrate all the provided components.
  * Candidates should:
  * 1. Replace mock data with real API calls to TheMealDB - DONE
- * 2. Implement actual state management (useState/useReducer)
+ * 2. Implement actual state management (useState/useReducer) - DONE
  * 3. Connect handlers to update state and trigger API calls
  * 4. Implement caching strategy for API responses
  * 5. Add error handling and loading states
@@ -21,17 +22,23 @@ import {Area, Category, Meal} from "@/types/meal";
  */
 export default function Home() {
 
+  // State management
   const [meals, setMeals] = useState<Meal[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
 
   useEffect(() => {
     getCategories().then(setCategories);
-  }, [])
+  }, []);
 
   useEffect(() => {
     getAreas().then(setAreas);
-  }, [])
+  }, []);
+
+  // Filter state
+  const [state, dispatch] = useReducer(filterReducer, initialFilterState);
+  const { categories: selectedCategories, areas: selectedAreas } = state;
+
 
     // Mock handlers
   const handleSearch = async (query: string): Promise<void> => {
@@ -40,19 +47,19 @@ export default function Home() {
   };
 
   const handleRemoveCategory = (category: string) => {
-    console.log("Remove category:", category);
+    dispatch({ type: "REMOVE_CATEGORY", payload: category });
   };
 
   const handleRemoveArea = (area: string) => {
-    console.log("Remove area:", area);
+    dispatch({ type: "REMOVE_AREA", payload: area });
   };
 
   const handleCategoryToggle = (category: string) => {
-    console.log("Toggle category:", category);
+    dispatch({ type: "TOGGLE_CATEGORY", payload: category });
   };
 
   const handleAreaToggle = (area: string) => {
-    console.log("Toggle area:", area);
+    dispatch({ type: "TOGGLE_AREA", payload: area });
   };
 
   const handlePageChange = (page: number) => {
@@ -86,8 +93,8 @@ export default function Home() {
             <FilterPanel
               categories={categories}
               areas={areas}
-              selectedCategories={["Dessert"]}
-              selectedAreas={["British"]}
+              selectedCategories={selectedCategories}
+              selectedAreas={selectedAreas}
               onCategoryToggle={handleCategoryToggle}
               onAreaToggle={handleAreaToggle}
             />
@@ -97,8 +104,8 @@ export default function Home() {
           <main className="flex-1">
             {/* Active Filters */}
             <ActiveFilters
-              selectedCategories={["Dessert"]}
-              selectedAreas={["British"]}
+              selectedCategories={selectedCategories}
+              selectedAreas={selectedAreas}
               onRemoveCategory={handleRemoveCategory}
               onRemoveArea={handleRemoveArea}
             />
