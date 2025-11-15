@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { MealResponse } from '../../types/meal';
+import {mealApi} from "@/lib/api/meals";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<MealResponse>) {
     const { query } = req.query;
 
     try {
-        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query as string)}`);
-        const data = await response.json();
+        const data = await mealApi<MealResponse>(`/search.php?s=${encodeURIComponent(query as string)}`);
         res.status(200).json(data);
     } catch (err) {
         console.error('Error fetching meals:', err);
