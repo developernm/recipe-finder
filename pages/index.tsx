@@ -31,10 +31,10 @@ export default function Home() {
   const [areas, setAreas] = useState<Area[]>([]);
 
   useEffect(() => {
-    getCategories().then(setCategories);
-  }, []);
+    // Fetch initial data (Just to populate some meals for now) - No access to "Lookup a selection of 10 random meals" api call
+    // searchMeals("all").then(setMeals);
 
-  useEffect(() => {
+    getCategories().then(setCategories);
     getAreas().then(setAreas);
   }, []);
 
@@ -101,6 +101,10 @@ export default function Home() {
     dispatch({ type: "TOGGLE_AREA", payload: area });
   };
 
+  const handleOnClearClick = () => {
+    dispatch({ type: "CLEAR_ALL" });
+  };
+
   const handlePageChange = (page: number) => {
     console.log("Change to page:", page);
   };
@@ -142,6 +146,7 @@ export default function Home() {
               selectedAreas={selectedAreas}
               onCategoryToggle={handleCategoryToggle}
               onAreaToggle={handleAreaToggle}
+              onClearClick={handleOnClearClick}
             />
           </aside>
 

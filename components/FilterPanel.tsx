@@ -16,6 +16,8 @@ interface FilterPanelProps {
   onCategoryToggle: (category: string) => void;
   /** Callback when an area is toggled */
   onAreaToggle: (area: string) => void;
+  /** Callback when "Clear all" button is clicked */
+  onClearClick: () => void;
 }
 
 /**
@@ -38,6 +40,7 @@ export default function FilterPanel({
   selectedAreas,
   onCategoryToggle,
   onAreaToggle,
+  onClearClick,
 }: FilterPanelProps) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -83,7 +86,8 @@ export default function FilterPanel({
 
         {(selectedCategories.length > 0 || selectedAreas.length > 0) && (
           <div className="flex gap-2">
-            <button className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium rounded-lg transition-colors duration-200">Clear all</button>
+            <button onClick={() => onClearClick()}
+                    className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium rounded-lg transition-colors duration-200">Clear all</button>
           </div>
         )}
       </div>

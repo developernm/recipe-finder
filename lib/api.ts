@@ -9,9 +9,11 @@ import {
   MealSummaryResponse
 } from "@/types/meal";
 
+// Cache for filter results
 const categoryCache = new Map<string, MealSummary[]>();
 const areaCache = new Map<string, MealSummary[]>();
 
+// Helper function to handle API responses
 export async function handleResponse<T>(response: Response) {
   if (!response.ok) {
     let message = `Failed to fetch data: ${response.status}`;
@@ -28,6 +30,7 @@ export async function handleResponse<T>(response: Response) {
   return data;
 }
 
+// Public API functions
 export async function searchMeals(query: string): Promise<Meal[]> {
     const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`, { method: 'GET' });
     const data: MealResponse = await handleResponse<MealResponse>(response)
