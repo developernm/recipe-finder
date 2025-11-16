@@ -7,6 +7,8 @@ import {useEffect, useReducer, useState} from "react";
 import {getAreas, getCategories, searchMeals, filterByCategory, filterByArea} from "@/lib/api";
 import {Area, Category, Meal, MealSummary} from "@/types/meal";
 import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
+import EmptyState from "@/components/EmptyState";
+import {useRouter} from "next/router";
 
 /**
  * Home Page Component
@@ -21,6 +23,9 @@ import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
  * 6. Complete the FilterPanel component implementation
  */
 export default function Home() {
+  const router = useRouter();
+  const searchFromUrl = router.query.search as string | undefined;
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // State management
   const [isLoading, setIsLoading] = useState(false);
@@ -81,9 +86,35 @@ export default function Home() {
 
     // Mock handlers
   const handleSearch = async (query: string): Promise<void> => {
+    setSearchQuery(query);
     const result = await searchMeals(query);
     setMeals(result);
   };
+
+  const onSearch = async (query: string) => {
+    setSearchQuery(query);
+
+    router.push({
+        pathname: '/',
+        query: { search: query }
+      },
+      undefined,
+      { shallow: true }
+    );
+
+    await handleSearch(query);
+  };
+
+  useEffect(() => {
+    if(!router.isReady) return;
+    const searchFromUrl = router.query.search as string | undefined;
+
+    if (!searchFromUrl) return;
+    if(searchQuery === searchFromUrl) return;
+
+    setSearchQuery(searchFromUrl);
+    handleSearch(searchFromUrl)
+  }, [router.isReady, router.query.search, searchQuery]);
 
   const handleRemoveCategory = (category: string) => {
     dispatch({ type: "REMOVE_CATEGORY", payload: category });
@@ -110,13 +141,13 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Recipe Finder
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Search and discover delicious meals from around the world
           </p>
         </header>
@@ -131,7 +162,8 @@ export default function Home() {
         <div className="mb-6">
           <SearchBar
             placeholder="Search for meals..."
-            onSearch={handleSearch}
+            defaultValue={searchFromUrl}
+            onSearch={onSearch}
           />
         </div>
 
@@ -178,17 +210,18 @@ export default function Home() {
               ))}
             </div>
 
+            {(!isLoading && meals.length === 0) && <EmptyState
+                selectedAreas={selectedAreas}
+                selectedCategories={selectedCategories}
+                searchQuery={searchQuery}
+            />}
+
             {/* Pagination */}
             <Pagination
               currentPage={1}
               totalPages={5}
               onPageChange={handlePageChange}
             />
-
-            {/* <EmptyState
-              title="No meals found"
-              message="Try adjusting your search or filters"
-            /> */}
           </main>
         </div>
       </div>

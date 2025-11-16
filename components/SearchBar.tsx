@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 
 /**
  * Props for the SearchBar component
@@ -37,6 +37,11 @@ export default function SearchBar({
   onSearch,
 }: SearchBarProps) {
   const [searchValue, setSearchValue] = useState(defaultValue);
+
+  // sync when the parent changes defaultValue (value from the url)
+  useEffect(() => {
+    setSearchValue(defaultValue);
+  }, [defaultValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
