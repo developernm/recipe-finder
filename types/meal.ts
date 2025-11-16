@@ -97,3 +97,10 @@ export interface MealFilters {
   areas?: string[];
   ingredients?: string[];
 }
+
+export interface ApiError {
+  error: string;
+}
+
+export type CategoryResult = CategoryResponse | ApiError;
+export type MealsResult = MealSummaryResponse | ApiError;

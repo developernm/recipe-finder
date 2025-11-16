@@ -4,8 +4,8 @@ import ActiveFilters from "@/components/ActiveFilters";
 import MealCard from "@/components/MealCard";
 import Pagination from "@/components/Pagination";
 import {useEffect, useReducer, useState} from "react";
-import {getAreas, getCategories, searchMeals} from "@/lib/api";
-import {Area, Category, Meal} from "@/types/meal";
+import {getAreas, getCategories, searchMeals, filterByCategory} from "@/lib/api";
+import {Area, Category, Meal, MealSummary} from "@/types/meal";
 import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
 
 /**
@@ -37,8 +37,27 @@ export default function Home() {
 
   // Filter state
   const [state, dispatch] = useReducer(filterReducer, initialFilterState);
-  const { categories: selectedCategories, areas: selectedAreas } = state;
+  const {categories: selectedCategories, areas: selectedAreas} = state;
 
+  useEffect(() => {
+    if (categories.length === 0) {
+      return;
+    }
+
+    const fetchFilteredMeals = async () => {
+      let categoryResults: any[] = [];
+
+      if (selectedCategories.length > 0) {
+        categoryResults = await filterByCategory(selectedCategories);
+      }
+
+      const all = [...categoryResults];
+
+      setMeals(all);
+    }
+
+    fetchFilteredMeals();
+  }, [selectedCategories, selectedAreas]);
 
     // Mock handlers
   const handleSearch = async (query: string): Promise<void> => {
