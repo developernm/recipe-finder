@@ -17,7 +17,7 @@ import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
  * 2. Implement actual state management (useState/useReducer) - DONE
  * 3. Connect handlers to update state and trigger API calls - DONE
  * 4. Implement caching strategy for API responses - DONE
- * 5. Add error handling and loading states
+ * 5. Add error handling and loading states - DONE
  * 6. Complete the FilterPanel component implementation
  */
 export default function Home() {
