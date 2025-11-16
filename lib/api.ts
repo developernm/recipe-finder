@@ -46,3 +46,12 @@ export async function filterByCategory(selected: string[]): Promise<MealSummary[
   const data: MealSummaryResponse = await handleResponse<MealSummaryResponse>(response, { meals: [] })
   return data.meals ?? [];
 }
+
+export async function filterByArea(selected: string[]): Promise<MealSummary[]> {
+  const params = new URLSearchParams();
+  params.set('areas', selected.join(','));
+
+  const response = await fetch(`/api/filter/area?${params}`, { method: 'GET' });
+  const data: MealSummaryResponse = await handleResponse<MealSummaryResponse>(response, { meals: [] })
+  return data.meals ?? [];
+}

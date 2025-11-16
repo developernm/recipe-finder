@@ -4,7 +4,7 @@ import ActiveFilters from "@/components/ActiveFilters";
 import MealCard from "@/components/MealCard";
 import Pagination from "@/components/Pagination";
 import {useEffect, useReducer, useState} from "react";
-import {getAreas, getCategories, searchMeals, filterByCategory} from "@/lib/api";
+import {getAreas, getCategories, searchMeals, filterByCategory, filterByArea} from "@/lib/api";
 import {Area, Category, Meal, MealSummary} from "@/types/meal";
 import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
 
@@ -15,7 +15,7 @@ import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
  * Candidates should:
  * 1. Replace mock data with real API calls to TheMealDB - DONE
  * 2. Implement actual state management (useState/useReducer) - DONE
- * 3. Connect handlers to update state and trigger API calls
+ * 3. Connect handlers to update state and trigger API calls - DONE
  * 4. Implement caching strategy for API responses
  * 5. Add error handling and loading states
  * 6. Complete the FilterPanel component implementation
@@ -40,20 +40,26 @@ export default function Home() {
   const {categories: selectedCategories, areas: selectedAreas} = state;
 
   useEffect(() => {
-    if (categories.length === 0) {
+    if (categories.length === 0 && areas.length === 0) {
       return;
     }
 
     const fetchFilteredMeals = async () => {
-      let categoryResults: any[] = [];
+      let categoryResults: MealSummary[] = [];
+      let areaResults: MealSummary[] = [];
 
       if (selectedCategories.length > 0) {
         categoryResults = await filterByCategory(selectedCategories);
       }
 
-      const all = [...categoryResults];
+      if (selectedAreas.length > 0) {
+        areaResults = await filterByArea(selectedAreas);
+      }
 
-      setMeals(all);
+      const all = [...categoryResults, ...areaResults];
+      const uniqueMealsOnly = Array.from(new Map(all.map(meal => [meal.idMeal, meal])).values());
+
+      setMeals(uniqueMealsOnly as Meal[]);
     }
 
     fetchFilteredMeals();
