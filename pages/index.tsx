@@ -23,6 +23,9 @@ import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
 export default function Home() {
 
   // State management
+  const [isLoading, setIsLoading] = useState(false);
+  const [filterError, setFilterError] = useState<string | null>(null);
+
   const [meals, setMeals] = useState<Meal[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
@@ -45,21 +48,32 @@ export default function Home() {
     }
 
     const fetchFilteredMeals = async () => {
-      let categoryResults: MealSummary[] = [];
-      let areaResults: MealSummary[] = [];
+      setIsLoading(true);
+      setFilterError(null);
 
-      if (selectedCategories.length > 0) {
-        categoryResults = await filterByCategory(selectedCategories);
+      try {
+        let categoryResults: MealSummary[] = [];
+        let areaResults: MealSummary[] = [];
+
+        if (selectedCategories.length > 0) {
+          categoryResults = await filterByCategory(selectedCategories);
+        }
+
+        if (selectedAreas.length > 0) {
+          areaResults = await filterByArea(selectedAreas);
+        }
+
+        const all = [...categoryResults, ...areaResults];
+        const uniqueMealsOnly = Array.from(new Map(all.map(meal => [meal.idMeal, meal])).values());
+
+        setMeals(uniqueMealsOnly as Meal[]);
+      } catch (error) {
+        console.log("Error fetching filterd meals:", error);
+        setFilterError("Failed to fetch filtered meals. Please try again.");
+        setMeals([]);
+      } finally {
+        setIsLoading(false);
       }
-
-      if (selectedAreas.length > 0) {
-        areaResults = await filterByArea(selectedAreas);
-      }
-
-      const all = [...categoryResults, ...areaResults];
-      const uniqueMealsOnly = Array.from(new Map(all.map(meal => [meal.idMeal, meal])).values());
-
-      setMeals(uniqueMealsOnly as Meal[]);
     }
 
     fetchFilteredMeals();
@@ -103,6 +117,12 @@ export default function Home() {
           </p>
         </header>
 
+        {filterError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            {filterError}
+          </div>
+        )}
+
         {/* Search Bar */}
         <div className="mb-6">
           <SearchBar
@@ -134,6 +154,10 @@ export default function Home() {
               onRemoveCategory={handleRemoveCategory}
               onRemoveArea={handleRemoveArea}
             />
+
+            {isLoading && (
+              <p className="text-center text-gray-600 dark:text-gray-400">Loading your meals...</p>
+            )}
 
             {/* Meal Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
