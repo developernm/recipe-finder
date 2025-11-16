@@ -9,6 +9,9 @@ import {
   MealSummaryResponse
 } from "@/types/meal";
 
+const categoryCache = new Map<string, MealSummary[]>();
+const areaCache = new Map<string, MealSummary[]>();
+
 export async function handleResponse<T>(response: Response, fallback: T) {
   if (!response.ok) return fallback;
 
@@ -39,19 +42,29 @@ export async function getAreas(): Promise<Area[]> {
 }
 
 export async function filterByCategory(selected: string[]): Promise<MealSummary[]> {
+  const key = selected.join(',');
+  if(categoryCache.has(key)) return categoryCache.get(key)!;
+
   const params = new URLSearchParams();
   params.set('categories', selected.join(','));
 
   const response = await fetch(`/api/filter/category?${params}`, { method: 'GET' });
   const data: MealSummaryResponse = await handleResponse<MealSummaryResponse>(response, { meals: [] })
+
+  categoryCache.set(key, data.meals ?? []);
   return data.meals ?? [];
 }
 
 export async function filterByArea(selected: string[]): Promise<MealSummary[]> {
+  const key = selected.join(',');
+  if(areaCache.has(key)) return areaCache.get(key)!;
+
   const params = new URLSearchParams();
   params.set('areas', selected.join(','));
 
   const response = await fetch(`/api/filter/area?${params}`, { method: 'GET' });
   const data: MealSummaryResponse = await handleResponse<MealSummaryResponse>(response, { meals: [] })
+
+  areaCache.set(key, data.meals ?? []);
   return data.meals ?? [];
 }

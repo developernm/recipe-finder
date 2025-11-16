@@ -16,7 +16,7 @@ import {filterReducer, initialFilterState} from "@/reducers/filterReducer";
  * 1. Replace mock data with real API calls to TheMealDB - DONE
  * 2. Implement actual state management (useState/useReducer) - DONE
  * 3. Connect handlers to update state and trigger API calls - DONE
- * 4. Implement caching strategy for API responses
+ * 4. Implement caching strategy for API responses - DONE
  * 5. Add error handling and loading states
  * 6. Complete the FilterPanel component implementation
  */
