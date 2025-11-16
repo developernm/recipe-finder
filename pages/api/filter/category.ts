@@ -13,6 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const selected = (categories as string).split(',');
     const results: MealSummary[] = [];
 
+    // No access to premium api call to handle multiple...
     for (const category of selected) {
       const data = await mealApi<MealSummaryResponse>(`/filter.php?c=${encodeURIComponent(category)}`);
       if (data.meals) results.push(...data.meals)
