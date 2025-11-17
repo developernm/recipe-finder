@@ -16,6 +16,11 @@ Create a functional recipe application that allows users to search for meals, fi
 
 ## Getting Started
 
+### Local Environment
+
+Create `.env.local` file and add `NEXT_PUBLIC_API_BASE=https://www.themealdb.com/api/json/v1/1`
+
+
 ### Installation
 
 ```bash

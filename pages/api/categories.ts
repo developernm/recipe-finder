@@ -4,6 +4,7 @@ import {mealApi} from "@/lib/api/meals";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<CategoryResponse>) {
     try {
+        // Fetch the data from our external api using our helper function
         const data = await mealApi<CategoryResponse>(`/categories.php`);
         res.status(200).json(data);
     } catch (err) {

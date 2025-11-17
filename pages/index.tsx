@@ -23,11 +23,13 @@ import {useRouter} from "next/router";
  * 6. Complete the FilterPanel component implementation
  */
 export default function Home() {
+
+  // Router hook to handle search via url logic
   const router = useRouter();
   const searchFromUrl = router.query.search as string | undefined;
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // State management
+  // State management hooks
   const [isLoading, setIsLoading] = useState(false);
   const [filterError, setFilterError] = useState<string | null>(null);
 
@@ -35,6 +37,7 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [areas, setAreas] = useState<Area[]>([]);
 
+  // I should have used SSR to fetch this data first via getServerSideProps
   useEffect(() => {
     // Fetch initial data (Just to populate some meals for now) - No access to "Lookup a selection of 10 random meals" api call
     // searchMeals("all").then(setMeals);
@@ -45,8 +48,10 @@ export default function Home() {
 
   // Filter state
   const [state, dispatch] = useReducer(filterReducer, initialFilterState);
+  // destruct the reducer state
   const {categories: selectedCategories, areas: selectedAreas} = state;
 
+  // side effect hook to handle displaying the filtered meals
   useEffect(() => {
     if (categories.length === 0 && areas.length === 0) {
       return;
@@ -82,6 +87,7 @@ export default function Home() {
     }
 
     fetchFilteredMeals();
+    // Runs whenever selectedCategories, selectedAreas changes
   }, [selectedCategories, selectedAreas]);
 
     // Mock handlers
